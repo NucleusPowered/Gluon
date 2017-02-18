@@ -74,7 +74,6 @@ public class Gluon {
         Optional<NucleusMessageTokenService> messageTokenService = Sponge.getServiceManager().provide(NucleusMessageTokenService.class);
         Optional<PlaceholderService> placeholderService = Sponge.getServiceManager().provide(PlaceholderService.class);
 
-
         if (messageTokenService.isPresent() && placeholderService.isPresent()) {
             // Nucleus -> Placeholder API
             placeholderService.get().registerPlaceholder(new Expansion() {
@@ -125,6 +124,9 @@ public class Gluon {
             } catch (PluginAlreadyRegisteredException e) {
                 e.printStackTrace();
             }
+
+            // We're done here.
+            Sponge.getEventManager().unregisterListeners(this);
         }
     }
 }
