@@ -111,7 +111,7 @@ public class Gluon {
                     private PlaceholderService service = placeholderService.get();
 
                     @Nonnull @Override public Optional<Text> parse(String s, CommandSource commandSource, Map<String, Object> map) {
-                        if (commandSource instanceof Player && !s.startsWith("nucleus_pl:gluon")) {
+                        if (commandSource instanceof Player && !s.startsWith("nucleus_pl:" + Gluon.ID)) {
                             return Optional.of(service.replacePlaceholders((Player)commandSource, "%" + s + "%"));
                         }
 
@@ -120,7 +120,7 @@ public class Gluon {
                 });
 
                 // Register the token format.
-                messageTokenService.get().registerTokenFormat("{%", "%}", "pl:gluon:$1");
+                messageTokenService.get().registerTokenFormat("{%", "%}", "pl:" + Gluon.ID + ":$1");
             } catch (PluginAlreadyRegisteredException e) {
                 e.printStackTrace();
             }
