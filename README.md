@@ -6,7 +6,7 @@ A bridge that links the Nucleus and PlaceholderAPI systems together
 First, ensure you have the following plugins available:
 
 * Nucleus, at least version 0.24.0
-* PlaceholderAPI, at least version 3.4
+* PlaceholderAPI, at least version 3.5
 
 Drop it into your mods directory and start your server!
 

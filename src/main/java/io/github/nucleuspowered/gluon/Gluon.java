@@ -100,7 +100,7 @@ public class Gluon {
                     return service.getPrimaryTokens();
                 }
 
-                @Override public Text onPlaceholderRequest(Player player, Optional<String> optional, Function<String, Text> function) {
+                @Override public Text onPlaceholderRequest(Player player, Optional<String> optional) {
                     return optional.map(s -> messageTokenService.get().parseToken(s, player).orElse(Text.EMPTY)).orElse(Text.EMPTY);
                 }
             });
