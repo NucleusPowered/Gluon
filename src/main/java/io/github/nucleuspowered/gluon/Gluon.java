@@ -51,7 +51,7 @@ public class Gluon {
 
     final static String ID = "nucleus-gluon";
     final static String NAME = "Nucleus Gluon";
-    final static String VERSION = "1.0";
+    final static String VERSION = "1.0.2";
     final static String DESCRIPTION = "A Nucleus - Placeholder API bridge.";
     final static String AUTHOR = "dualspiral";
 
@@ -64,17 +64,12 @@ public class Gluon {
 
     @Listener
     public void onServiceRegisterEvent(ChangeServiceProviderEvent event) {
-        if (event.getNewProvider() instanceof PlaceholderService) {
-            Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.GREEN, "Placeholder API service registered."));
-        } else if (event.getNewProvider() instanceof NucleusMessageTokenService) {
-            Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.GREEN, "Nucleus Message Token service registered."));
-        }
-
         // Get the services
         Optional<NucleusMessageTokenService> messageTokenService = Sponge.getServiceManager().provide(NucleusMessageTokenService.class);
         Optional<PlaceholderService> placeholderService = Sponge.getServiceManager().provide(PlaceholderService.class);
 
         if (messageTokenService.isPresent() && placeholderService.isPresent()) {
+            Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.GREEN, Gluon.NAME, " version ", Gluon.VERSION));
             // Nucleus -> Placeholder API
             placeholderService.get().registerPlaceholder(new Expansion() {
 
