@@ -47,7 +47,7 @@ import me.rojo8399.placeholderapi.Source;
 import me.rojo8399.placeholderapi.Token;
 
 @Plugin(id = Gluon.ID, name = Gluon.NAME, version = Gluon.VERSION, authors = Gluon.AUTHOR, description = Gluon.DESCRIPTION, dependencies = {
-		@Dependency(id = "nucleus"), @Dependency(id = "placeholderapi") })
+		@Dependency(id = "nucleus"), @Dependency(id = "placeholderapi", version = "[4.0,)") })
 public class Gluon {
 
 	final static String ID = "nucleus-gluon";
