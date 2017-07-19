@@ -22,13 +22,14 @@
  */
 package io.github.nucleuspowered.gluon;
 
-import io.github.nucleuspowered.nucleus.api.exceptions.PluginAlreadyRegisteredException;
-import io.github.nucleuspowered.nucleus.api.service.NucleusMessageTokenService;
-import me.rojo8399.placeholderapi.PlaceholderService;
-import me.rojo8399.placeholderapi.expansions.Expansion;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.service.ChangeServiceProviderEvent;
 import org.spongepowered.api.plugin.Dependency;
@@ -37,91 +38,82 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
+import io.github.nucleuspowered.nucleus.api.exceptions.NucleusException;
+import io.github.nucleuspowered.nucleus.api.exceptions.PluginAlreadyRegisteredException;
+import io.github.nucleuspowered.nucleus.api.service.NucleusMessageTokenService;
+import me.rojo8399.placeholderapi.Placeholder;
+import me.rojo8399.placeholderapi.PlaceholderService;
+import me.rojo8399.placeholderapi.Source;
+import me.rojo8399.placeholderapi.Token;
 
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
-
-@Plugin(id = Gluon.ID, name = Gluon.NAME, version = Gluon.VERSION, authors = Gluon.AUTHOR, description = Gluon.DESCRIPTION, dependencies =
-        {@Dependency(id = "nucleus"), @Dependency(id = "placeholderapi")})
+@Plugin(id = Gluon.ID, name = Gluon.NAME, version = Gluon.VERSION, authors = Gluon.AUTHOR, description = Gluon.DESCRIPTION, dependencies = {
+		@Dependency(id = "nucleus"), @Dependency(id = "placeholderapi", version = "[4.0,)") })
 public class Gluon {
 
-    final static String ID = "nucleus-gluon";
-    final static String NAME = "Nucleus Gluon";
-    final static String VERSION = "1.0.2";
-    final static String DESCRIPTION = "A Nucleus - Placeholder API bridge.";
-    final static String AUTHOR = "dualspiral";
+	final static String ID = "nucleus-gluon";
+	final static String NAME = "Nucleus Gluon";
+	final static String VERSION = "1.0.3";
+	final static String DESCRIPTION = "A Nucleus - Placeholder API bridge.";
+	final static String AUTHOR = "dualspiral";
 
-    private final PluginContainer container;
+	private final PluginContainer container;
+	private NucleusMessageTokenService messageService;
 
-    @Inject
-    public Gluon(PluginContainer container) {
-        this.container = container;
-    }
+	@Inject
+	public Gluon(PluginContainer container) {
+		this.container = container;
+	}
 
-    @Listener
-    public void onServiceRegisterEvent(ChangeServiceProviderEvent event) {
-        // Get the services
-        Optional<NucleusMessageTokenService> messageTokenService = Sponge.getServiceManager().provide(NucleusMessageTokenService.class);
-        Optional<PlaceholderService> placeholderService = Sponge.getServiceManager().provide(PlaceholderService.class);
+	@Placeholder(id = "nucleus")
+	public Text nucleus(@Source CommandSource source, @Token String token) throws NucleusException {
+		if (messageService == null) {
+			return null;
+		}
+		return messageService.applyPrimaryToken(token, source).orElse(null);
+	}
 
-        if (messageTokenService.isPresent() && placeholderService.isPresent()) {
-            Sponge.getServer().getConsole().sendMessage(Text.of(TextColors.GREEN, Gluon.NAME, " version ", Gluon.VERSION));
-            // Nucleus -> Placeholder API
-            placeholderService.get().registerPlaceholder(new Expansion() {
+	@Listener
+	public void onServiceRegisterEvent(ChangeServiceProviderEvent event) {
+		// Get the services
+		Optional<NucleusMessageTokenService> messageTokenService = Sponge.getServiceManager()
+				.provide(NucleusMessageTokenService.class);
+		Optional<PlaceholderService> placeholderService = Sponge.getServiceManager().provide(PlaceholderService.class);
 
-                private NucleusMessageTokenService service = messageTokenService.get();
+		if (messageTokenService.isPresent() && placeholderService.isPresent()) {
+			messageService = messageTokenService.get();
+			Sponge.getServer().getConsole()
+					.sendMessage(Text.of(TextColors.GREEN, Gluon.NAME, " version ", Gluon.VERSION));
+			// Nucleus -> Placeholder API
+			try {
+				placeholderService.get().load(this, "nucleus", this).author(AUTHOR).version(VERSION)
+						.description(DESCRIPTION).tokens(messageService.getPrimaryTokens()).buildAndRegister();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
-                @Override public boolean canRegister() {
-                    return true;
-                }
+			// Register this as a token parser.
+			try {
+				messageTokenService.get().register(this.container, new NucleusMessageTokenService.TokenParser() {
+					private PlaceholderService service = placeholderService.get();
 
-                @Override public String getIdentifier() {
-                    return "nucleus";
-                }
+					@Nonnull
+					@Override
+					public Optional<Text> parse(String s, CommandSource commandSource, Map<String, Object> map) {
+						if (!s.startsWith("nucleus_pl:" + Gluon.ID)) {
+							return service.parse(s, commandSource, commandSource, Text.class);
+						}
+						return Optional.empty();
+					}
+				});
 
-                @Override public String getAuthor() {
-                    return AUTHOR;
-                }
+				// Register the token format.
+				messageTokenService.get().registerTokenFormat("{%", "%}", "pl:" + Gluon.ID + ":$1");
+			} catch (PluginAlreadyRegisteredException e) {
+				e.printStackTrace();
+			}
 
-                @Override public String getVersion() {
-                    return VERSION;
-                }
-
-                @Override public List<String> getSupportedTokens() {
-                    return service.getPrimaryTokens();
-                }
-
-                @Override public Text onPlaceholderRequest(Player player, Optional<String> optional) {
-                    return optional.map(s -> messageTokenService.get().parseToken(s, player).orElse(Text.EMPTY)).orElse(Text.EMPTY);
-                }
-            });
-
-            // Register this as a token parser.
-            try {
-                messageTokenService.get().register(this.container, new NucleusMessageTokenService.TokenParser() {
-                    private PlaceholderService service = placeholderService.get();
-
-                    @Nonnull @Override public Optional<Text> parse(String s, CommandSource commandSource, Map<String, Object> map) {
-                        if (commandSource instanceof Player && !s.startsWith("nucleus_pl:" + Gluon.ID)) {
-                            return Optional.of(service.replacePlaceholders((Player)commandSource, "%" + s + "%"));
-                        }
-
-                        return Optional.empty();
-                    }
-                });
-
-                // Register the token format.
-                messageTokenService.get().registerTokenFormat("{%", "%}", "pl:" + Gluon.ID + ":$1");
-            } catch (PluginAlreadyRegisteredException e) {
-                e.printStackTrace();
-            }
-
-            // We're done here.
-            Sponge.getEventManager().unregisterListeners(this);
-        }
-    }
+			// We're done here.
+			Sponge.getEventManager().unregisterListeners(this);
+		}
+	}
 }

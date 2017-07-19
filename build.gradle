@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    compile "io.github.nucleuspowered:nucleus-api:0.24.0-SNAPSHOT-S5.1"
+    compile "io.github.nucleuspowered:nucleus-api:1.1.0-SNAPSHOT-S5.1"
     compile "com.github.rojo8399:PlaceholderAPI:master-SNAPSHOT"
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
