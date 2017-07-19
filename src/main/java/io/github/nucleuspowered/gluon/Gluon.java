@@ -69,7 +69,7 @@ public class Gluon {
 		if (messageService == null) {
 			return null;
 		}
-		return messageService.createFromString(token).getForCommandSource(source);
+		return messageService.applyPrimaryToken(token, source).orElse(null);
 	}
 
 	@Listener
@@ -86,7 +86,7 @@ public class Gluon {
 			// Nucleus -> Placeholder API
 			try {
 				placeholderService.get().load(this, "nucleus", this).author(AUTHOR).version(VERSION)
-						.tokens(messageService.getPrimaryTokens()).buildAndRegister();
+						.description(DESCRIPTION).tokens(messageService.getPrimaryTokens()).buildAndRegister();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
