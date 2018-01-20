@@ -22,22 +22,6 @@
  */
 package io.github.nucleuspowered.gluon;
 
-import java.util.Map;
-import java.util.Optional;
-
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
-
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.service.ChangeServiceProviderEvent;
-import org.spongepowered.api.plugin.Dependency;
-import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-
 import io.github.nucleuspowered.nucleus.api.exceptions.NucleusException;
 import io.github.nucleuspowered.nucleus.api.exceptions.PluginAlreadyRegisteredException;
 import io.github.nucleuspowered.nucleus.api.service.NucleusMessageTokenService;
@@ -45,9 +29,24 @@ import me.rojo8399.placeholderapi.Placeholder;
 import me.rojo8399.placeholderapi.PlaceholderService;
 import me.rojo8399.placeholderapi.Source;
 import me.rojo8399.placeholderapi.Token;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
+import org.spongepowered.api.plugin.Dependency;
+import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
+
+import java.util.Map;
+import java.util.Optional;
+
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
 @Plugin(id = Gluon.ID, name = Gluon.NAME, version = Gluon.VERSION, authors = Gluon.AUTHOR, description = Gluon.DESCRIPTION, dependencies = {
-        @Dependency(id = "nucleus"), @Dependency(id = "placeholderapi", version = "[4.0,)")})
+        @Dependency(id = "nucleus"), @Dependency(id = "placeholderapi", version = "[4.4,)")})
 public class Gluon {
 
     final static String ID = "nucleus-gluon";
@@ -73,7 +72,7 @@ public class Gluon {
     }
 
     @Listener
-    public void onServiceRegisterEvent(ChangeServiceProviderEvent event) {
+    public void registerService(GamePostInitializationEvent event) {
         // Get the services
         Optional<NucleusMessageTokenService> messageTokenService = Sponge.getServiceManager()
                 .provide(NucleusMessageTokenService.class);
