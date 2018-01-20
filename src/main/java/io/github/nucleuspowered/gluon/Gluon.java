@@ -52,7 +52,7 @@ public class Gluon {
 
     final static String ID = "nucleus-gluon";
     final static String NAME = "Nucleus Gluon";
-    final static String VERSION = "1.0.3";
+    final static String VERSION = "1.0.4";
     final static String DESCRIPTION = "A Nucleus - Placeholder API bridge.";
     final static String AUTHOR = "dualspiral";
 
