@@ -32,6 +32,7 @@ import me.rojo8399.placeholderapi.Token;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
@@ -71,7 +72,7 @@ public class Gluon {
         return messageService.applyPrimaryToken(token, source).orElse(null);
     }
 
-    @Listener
+    @Listener(order = Order.POST)
     public void registerService(GamePostInitializationEvent event) {
         // Get the services
         Optional<NucleusMessageTokenService> messageTokenService = Sponge.getServiceManager()
