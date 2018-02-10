@@ -1,3 +1,7 @@
+plugins {
+    id 'org.spongepowered.plugin' version '0.8.1'
+}
+
 group 'io.github.nucleuspowered.gluon'
 version '1.0.5-SNAPSHOT'
 
@@ -33,3 +37,4 @@ dependencies {
 }
 
 build.dependsOn(signArchives)
+printid.mustRunAfter(build)
