@@ -1,3 +1,11 @@
+# Gluon is now End of Life
+
+As we prepare to release Nucleus 2 which uses the Sponge placeholder API rather than the old PlaceholderAPI for Sponge which has not seen an update in years, we also say goodbye to Gluon, which has also not seen an update in two years (because it hasn't needed one!)
+
+This repo has been archived but remains for interest.
+
+---
+
 # Gluon
 A bridge that links the Nucleus and PlaceholderAPI systems together
 
